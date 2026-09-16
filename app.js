@@ -51,22 +51,6 @@ let products = loadJSON(PRODUCTS_FILE, [
     price: 74999, 
     image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=80",
     desc: "16-core ARM CPU, 64GB ECC RAM, dual 2.5G NICs designed for Kubernetes worker nodes." 
-  },
-  { 
-    id: 2, 
-    name: "Managed 8-Port PoE Switch", 
-    category: "Network", 
-    price: 14999, 
-    image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&auto=format&fit=crop&q=80",
-    desc: "Layer-2 managed gigabit switch with 802.3at PoE+ and quiet passive cooling." 
-  },
-  { 
-    id: 3, 
-    name: "Hardware Security Key (FIDO2)", 
-    category: "Security", 
-    price: 4599, 
-    image: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=600&auto=format&fit=crop&q=80",
-    desc: "USB-C cryptographic authenticator with dual NFC and tamper-resistant silicon." 
   }
 ]);
 
@@ -75,17 +59,14 @@ let orders = loadJSON(ORDERS_FILE, []);
 // GET products
 app.get('/api/products', (req, res) => res.json(products));
 
-// POST product with optional local image file upload
+// POST new product
 app.post('/api/products', upload.single('imageFile'), (req, res) => {
   const { name, category, price, desc, imageUrl } = req.body;
-  if (!name || !price) {
-    return res.status(400).json({ error: "Name and Price are required." });
-  }
+  if (!name || !price) return res.status(400).json({ error: "Name and Price are required." });
 
   const defaultImg = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80";
-  
-  // Prioritize local uploaded file, then pasted URL, then default image
   let finalImage = defaultImg;
+  
   if (req.file) {
     finalImage = '/uploads/' + req.file.filename;
   } else if (imageUrl && imageUrl.trim() !== '') {
@@ -94,11 +75,8 @@ app.post('/api/products', upload.single('imageFile'), (req, res) => {
 
   const newProduct = {
     id: Date.now(),
-    name,
-    category: category || "Compute",
-    price: Number(price),
-    image: finalImage,
-    desc: desc || "High-performance enterprise hardware component."
+    name, category: category || "Compute", price: Number(price),
+    image: finalImage, desc: desc || "High-performance enterprise hardware."
   };
 
   products.push(newProduct);
@@ -106,19 +84,52 @@ app.post('/api/products', upload.single('imageFile'), (req, res) => {
   res.status(201).json({ message: "Product listed successfully", product: newProduct });
 });
 
+// PUT update existing product
+app.put('/api/products/:id', upload.single('imageFile'), (req, res) => {
+  const productId = Number(req.params.id);
+  const targetIndex = products.findIndex(p => p.id === productId);
+  
+  if (targetIndex === -1) return res.status(404).json({ error: "Product not found" });
+
+  const { name, category, price, desc, imageUrl } = req.body;
+  let finalImage = products[targetIndex].image; // Keep existing by default
+
+  // Update image if a new one is provided
+  if (req.file) {
+    // Delete old file if it was a local upload to save space
+    if (finalImage.startsWith('/uploads/')) {
+      const oldPath = path.join(__dirname, 'public', finalImage);
+      if (fs.existsSync(oldPath)) { try { fs.unlinkSync(oldPath); } catch (err) {} }
+    }
+    finalImage = '/uploads/' + req.file.filename;
+  } else if (imageUrl && imageUrl.trim() !== '') {
+    finalImage = imageUrl.trim();
+  }
+
+  // Update properties
+  products[targetIndex] = {
+    ...products[targetIndex],
+    name: name || products[targetIndex].name,
+    category: category || products[targetIndex].category,
+    price: price ? Number(price) : products[targetIndex].price,
+    desc: desc || products[targetIndex].desc,
+    image: finalImage
+  };
+
+  saveJSON(PRODUCTS_FILE, products);
+  res.json({ message: "Product updated successfully" });
+});
+
 // DELETE product
 app.delete('/api/products/:id', (req, res) => {
   const productId = Number(req.params.id);
   const target = products.find(p => p.id === productId);
-  if (!target) {
-    return res.status(404).json({ error: "Product not found" });
-  }
+  if (!target) return res.status(404).json({ error: "Product not found" });
 
-  // If it was an uploaded local image, remove it from disk
   if (target.image && target.image.startsWith('/uploads/')) {
     const localFilePath = path.join(__dirname, 'public', target.image);
     if (fs.existsSync(localFilePath)) {
-      try { fs.unlinkSync(localFilePath); } catch (err) { console.error(err); }
+      try { fs.unlinkSync(localFilePath); } catch (err) { }
     }
   }
 
@@ -133,9 +144,7 @@ app.get('/api/orders', (req, res) => res.json(orders));
 // POST checkout
 app.post('/api/checkout', (req, res) => {
   const { items, buyerName, total } = req.body;
-  if (!items || items.length === 0) {
-    return res.status(400).json({ error: "Cart is empty" });
-  }
+  if (!items || items.length === 0) return res.status(400).json({ error: "Cart is empty" });
 
   const orderRecord = {
     id: "ORD-" + Math.floor(100000 + Math.random() * 900000),
