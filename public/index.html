@@ -42,7 +42,7 @@
     .hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; line-height: 1.6; margin-bottom: 30px; }
 
-    .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+    .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: gap: 20px; }
     .category-pills { display: flex; gap: 10px; }
     .cat-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.3s; }
     .cat-btn:hover { border-color: var(--text-muted); color: var(--text-main); }
@@ -52,7 +52,6 @@
     .search-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); width: 360px; }
 
     .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-
     @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
     .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; position: relative; backdrop-filter: blur(10px); transition: all 0.4s; animation: fadeUp 0.6s both; }
@@ -83,18 +82,26 @@
     .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
     .file-input { border: 1px dashed var(--border); padding: 20px; cursor: pointer; text-align: center; border-radius: 12px; background: rgba(255,255,255,0.02); }
 
-    .manage-list { display: flex; flex-direction: column; gap: 12px; }
-    .manage-card { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 16px 20px; border-radius: 12px; }
-    .btn-edit { background: rgba(6, 182, 212, 0.1); color: var(--accent); border: 1px solid rgba(6, 182, 212, 0.2); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .manage-list { display: flex; flex-direction: column; gap: 14px; }
+    .manage-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 16px 20px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .btn-edit { background: rgba(6, 182, 212, 0.1); color: var(--accent); border: 1px solid rgba(6, 182, 212, 0.2); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
     .btn-edit:hover { background: var(--accent); color: #000; }
-    .btn-del { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-del { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
     .btn-del:hover { background: var(--danger); color: #fff; }
     .action-group { display: flex; gap: 8px; }
+
+    /* ORDER HISTORY REDIRECT CARDS */
+    .order-link-card { background: rgba(0,0,0,0.35); border: 1px solid var(--border); padding: 18px 20px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-decoration: none; color: inherit; transition: all 0.25s ease; }
+    .order-link-card:hover { border-color: var(--accent); transform: translateX(4px); background: rgba(6, 182, 212, 0.05); }
+    .order-link-id { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--accent); font-size: 1.1rem; }
+    .order-link-buyer { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+    .order-link-right { display: flex; align-items: center; gap: 14px; }
+    .order-link-total { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--success); font-size: 1.15rem; }
+    .order-link-arrow { color: var(--text-muted); font-size: 1.2rem; }
 
     .checkout-btn { width: 100%; background: #fff; color: #000; border: none; padding: 16px; border-radius: 12px; font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
     .checkout-btn:hover { filter: brightness(0.9); }
     .cancel-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--border); }
-    .cancel-btn:hover { background: rgba(255,255,255,0.2); }
 
     /* CART DRAWER */
     .cart-drawer { position: fixed; top: 0; right: -480px; width: 440px; height: 100vh; background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(20px); border-left: 1px solid var(--border); padding: 30px; display: flex; flex-direction: column; transition: right 0.4s; z-index: 100; box-shadow: -20px 0 50px rgba(0,0,0,0.8); }
@@ -195,7 +202,7 @@
           <h2>Inventory Overview</h2>
           <div class="manage-list" id="sellerInventory"></div>
 
-          <h2 style="margin-top: 40px;">Order Ledger</h2>
+          <h2 style="margin-top: 40px;">Order History</h2>
           <div class="manage-list" id="ordersList"></div>
         </div>
       </div>
@@ -221,7 +228,7 @@
     let cart = JSON.parse(localStorage.getItem('nexus_cart') || '[]');
     let activeCategory = 'All';
     let searchQuery = '';
-    let editingId = null; // Tracks if we are editing an existing item
+    let editingId = null;
 
     const formatINR = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
 
@@ -250,16 +257,22 @@
         const res = await fetch('/api/orders');
         const orders = await res.json();
         const list = document.getElementById('ordersList');
-        if (orders.length === 0) { list.innerHTML = '<p style="color:var(--text-muted)">No orders yet.</p>'; return; }
+        if (orders.length === 0) {
+          list.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">No historical orders found.</p>';
+          return;
+        }
 
         list.innerHTML = orders.map(o => `
-          <div class="manage-card">
+          <a class="order-link-card" href="/order.html?id=${encodeURIComponent(o.id)}">
             <div>
-              <div style="font-weight:700; color:#fff;">${o.id}</div>
-              <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">${o.items.map(i => `${i.name} (x${i.qty})`).join(', ')}</div>
+              <div class="order-link-id">${o.id}</div>
+              <div class="order-link-buyer">${o.buyer} &bull; ${o.timestamp || 'Recorded'}</div>
             </div>
-            <div style="font-family:'Space Grotesk'; font-weight:700; color:var(--success);">${formatINR(o.total)}</div>
-          </div>
+            <div class="order-link-right">
+              <div class="order-link-total">${formatINR(o.total)}</div>
+              <span class="order-link-arrow">&rarr;</span>
+            </div>
+          </a>
         `).join('');
       } catch(e) {}
     }
@@ -327,7 +340,6 @@
       document.getElementById('devCategory').value = p.category;
       document.getElementById('devPrice').value = p.price;
       document.getElementById('devDesc').value = p.desc;
-      // Do not populate file URLs into the URL box if it's a local '/uploads/...' image
       document.getElementById('devImage').value = p.image.startsWith('/uploads/') ? '' : p.image;
       
       document.getElementById('formPanel').scrollIntoView({ behavior: 'smooth' });

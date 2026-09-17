@@ -3,489 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout // NexusCore Premium</title>
+  <title>NexusCore // Secure Checkout</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #030509;
-      --surface: rgba(15, 20, 31, 0.6);
+      --surface: rgba(15, 20, 31, 0.7);
       --border: rgba(255, 255, 255, 0.08);
       --primary: #8b5cf6;
       --accent: #06b6d4;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --success: #10b981;
-      --danger: #f43f5e;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      background-image: radial-gradient(circle at top right, rgba(139, 92, 246, 0.06), transparent 45%),
-                        radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.06), transparent 45%);
-    }
-    h1, h2, h3, .brand, .price-font { font-family: 'Space Grotesk', sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; padding: 40px 20px; }
+    h1, h2, h3, .brand { font-family: 'Space Grotesk', sans-serif; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .brand { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .brand-dot { width: 12px; height: 12px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; }
+    .back-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
+    .back-link:hover { color: #fff; }
 
-    header {
-      padding: 20px 40px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 14, 23, 0.7);
-      backdrop-filter: blur(16px);
-    }
-    .brand {
-      font-size: 1.4rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: #fff;
-    }
-    .brand-dot {
-      width: 10px;
-      height: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--primary);
-    }
-    .secure-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      color: var(--success);
-      font-weight: 500;
-    }
+    .checkout-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; }
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; backdrop-filter: blur(12px); }
+    .panel h2 { font-size: 1.3rem; margin-bottom: 20px; color: #fff; }
+    .form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .form-group input, .form-group textarea, .form-group select { background: rgba(0,0,0,0.4); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none; }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
 
-    .checkout-layout {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      min-height: calc(100vh - 80px);
-    }
-    @media (max-width: 900px) {
-      .checkout-layout { grid-template-columns: 1fr; }
-    }
+    .order-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+    .order-item:last-child { border-bottom: none; }
+    .total-box { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 1.4rem; font-family: 'Space Grotesk'; font-weight: 700; color: var(--accent); }
 
-    .form-panel {
-      padding: 44px;
-      border-right: 1px solid var(--border);
-    }
-    .summary-panel {
-      padding: 44px;
-      background: rgba(15, 20, 31, 0.4);
-    }
+    .pay-btn { width: 100%; background: #fff; color: #000; border: none; padding: 16px; border-radius: 12px; font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-top: 24px; transition: 0.2s; }
+    .pay-btn:hover { background: var(--accent); color: #000; }
 
-    h2 {
-      font-size: 1.3rem;
-      margin-bottom: 22px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .step-pill {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--text-main);
-      color: var(--bg);
-      font-size: 0.8rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      font-weight: 600;
-    }
-    input {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--border);
-      padding: 14px 16px;
-      border-radius: 12px;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.3s;
-    }
-    input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
-    }
-
-    /* PAYMENT METHOD SELECTION */
-    .pay-methods {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-    .pay-card {
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,0.3);
-      border-radius: 14px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-    .pay-card:hover {
-      border-color: rgba(255,255,255,0.2);
-    }
-    .pay-card.active {
-      border-color: var(--accent);
-      background: rgba(6, 182, 212, 0.08);
-    }
-    .pay-card input[type="radio"] {
-      accent-color: var(--accent);
-    }
-
-    /* SUMMARY SIDE */
-    .summary-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      max-height: 380px;
-      overflow-y: auto;
-      margin-bottom: 24px;
-      padding-right: 6px;
-    }
-    .summary-item {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      background: rgba(0,0,0,0.25);
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: 12px;
-    }
-    .item-thumb-wrap {
-      position: relative;
-      width: 56px;
-      height: 56px;
-      flex-shrink: 0;
-    }
-    .item-thumb {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .item-qty-tag {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: var(--text-main);
-      color: var(--bg);
-      font-size: 0.7rem;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-    .item-details { flex: 1; }
-    .item-name {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    .item-price {
-      font-size: 0.85rem;
-      color: var(--accent);
-      font-family: 'Space Grotesk';
-      font-weight: 700;
-    }
-
-    .bill-rows {
-      border-top: 1px solid var(--border);
-      padding-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      font-size: 0.95rem;
-    }
-    .bill-row {
-      display: flex;
-      justify-content: space-between;
-      color: var(--text-muted);
-    }
-    .bill-row.total {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #fff;
-      border-top: 1px solid var(--border);
-      padding-top: 16px;
-      margin-top: 4px;
-    }
-
-    .btn-checkout {
-      width: 100%;
-      background: #fff;
-      color: #000;
-      border: none;
-      padding: 16px;
-      border-radius: 12px;
-      font-family: 'Space Grotesk';
-      font-weight: 700;
-      font-size: 1.1rem;
-      cursor: pointer;
-      margin-top: 24px;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .btn-checkout:hover {
-      transform: scale(1.02);
-      background: var(--accent);
-      color: #000;
-    }
-
-    /* SUCCESS MODAL */
-    .success-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(3, 5, 9, 0.85);
-      backdrop-filter: blur(16px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-    }
-    .success-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 44px;
-      text-align: center;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
-    }
-    .success-icon {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--success);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      margin: 0 auto 20px;
-    }
-    .order-tag {
-      background: rgba(0,0,0,0.5);
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: 10px;
-      font-family: 'Space Grotesk';
-      color: var(--accent);
-      margin: 18px 0 24px;
-      font-weight: 700;
-    }
-    .hidden { display: none !important; }
+    .order-success { display: none; text-align: center; padding: 40px; }
+    .order-success h2 { font-size: 2rem; color: var(--success); margin-bottom: 12px; }
+    .order-success p { color: var(--text-muted); margin-bottom: 24px; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <div class="brand"><div class="brand-dot"></div> NexusCore</div>
+      <a href="/" class="back-link">&larr; Return to Storefront</a>
+    </header>
 
-  <header>
-    <a href="/" class="brand">
-      <div class="brand-dot"></div> NexusCore
-    </a>
-    <div class="secure-badge">
-      🔒 256-Bit SSL Encrypted
-    </div>
-  </header>
-
-  <div class="checkout-layout">
-    <!-- LEFT: CLIENT DETAILS FORM -->
-    <div class="form-panel">
-      <form id="payForm" onsubmit="handlePaySubmit(event)">
-        <h2><span class="step-pill">1</span> Client & Delivery Information</h2>
-        <div class="form-row">
+    <div id="checkoutContent" class="checkout-grid">
+      <div class="panel">
+        <h2>Customer & Delivery Details</h2>
+        <form id="checkoutForm" onsubmit="processPayment(event)">
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" id="buyerName" placeholder="e.g. John Doe" required>
+            <input type="text" id="buyerName" placeholder="e.g. Rahul Sharma" required>
           </div>
           <div class="form-group">
-            <label>Business Email</label>
-            <input type="email" id="buyerEmail" placeholder="john.doe@company.io" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Deployment / Datacenter Address</label>
-          <input type="text" id="buyerAddr" placeholder="Building, Rack Location, Tech Park" required>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>City</label>
-            <input type="text" id="buyerCity" placeholder="Hyderabad" required>
+            <label>Work Email</label>
+            <input type="email" id="buyerEmail" placeholder="rahul@company.io" required>
           </div>
           <div class="form-group">
-            <label>Postal Code</label>
-            <input type="text" id="buyerPin" placeholder="500085" required>
+            <label>Shipping / Datacenter Address</label>
+            <textarea id="buyerAddress" rows="3" placeholder="Street, Building / Rack, City, PIN" required></textarea>
           </div>
-        </div>
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select id="paymentMethod">
+              <option value="Razorpay / UPI">Razorpay / UPI Instant</option>
+              <option value="Corporate Credit Card">Corporate Credit Card (Visa / Mastercard)</option>
+              <option value="Net Banking (HDFC / ICICI / SBI)">Net Banking</option>
+              <option value="Purchase Order (Net-30 Invoice)">Purchase Order (Net-30)</option>
+            </select>
+          </div>
+          <button type="submit" id="submitOrderBtn" class="pay-btn">Confirm & Authorize Order</button>
+        </form>
+      </div>
 
-        <h2 style="margin-top: 36px;"><span class="step-pill">2</span> Payment Method</h2>
-        <div class="pay-methods">
-          <label class="pay-card active">
-            <input type="radio" name="method" value="UPI" checked onclick="toggleMethod(this)">
-            <div>
-              <div style="font-weight: 600;">Instant UPI / QR</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">GPay, PhonePe, Paytm (Zero Processing Fee)</div>
-            </div>
-          </label>
-          <label class="pay-card">
-            <input type="radio" name="method" value="Card" onclick="toggleMethod(this)">
-            <div>
-              <div style="font-weight: 600;">Enterprise Credit / Debit Card</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">Visa, MasterCard, RuPay Corporate</div>
-            </div>
-          </label>
-          <label class="pay-card">
-            <input type="radio" name="method" value="NetBanking" onclick="toggleMethod(this)">
-            <div>
-              <div style="font-weight: 600;">Wire Transfer / Corporate Net Banking</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">HDFC, ICICI, SBI Enterprise</div>
-            </div>
-          </label>
-        </div>
-
-        <button type="submit" class="btn-checkout" id="submitBtn">Authorize & Pay</button>
-      </form>
-    </div>
-
-    <!-- RIGHT: ORDER MANIFEST SUMMARY -->
-    <div class="summary-panel">
-      <h2 style="margin-bottom: 24px;">Order Manifest</h2>
-      <div class="summary-list" id="summaryItems"></div>
-
-      <div class="bill-rows">
-        <div class="bill-row">
-          <span>Subtotal</span>
-          <span id="subTotal" class="price-font">₹0</span>
-        </div>
-        <div class="bill-row">
-          <span>Secure Insured Shipping</span>
-          <span style="color: var(--success); font-weight: 600;">Complimentary</span>
-        </div>
-        <div class="bill-row">
-          <span>GST / Environmental Levy</span>
-          <span>Included</span>
-        </div>
-        <div class="bill-row total">
-          <span>Total (INR)</span>
-          <span id="grandTotal" class="price-font" style="color: var(--accent);">₹0</span>
+      <div class="panel">
+        <h2>Order Summary</h2>
+        <div id="checkoutItemList"></div>
+        <div class="total-box">
+          <span>Total Payable</span>
+          <span id="checkoutTotal">₹0</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- SUCCESS DIALOG -->
-  <div class="success-modal hidden" id="successModal">
-    <div class="success-box">
-      <div class="success-icon">✓</div>
-      <h2>Deployment Scheduled!</h2>
-      <p style="color: var(--text-muted); font-size: 0.95rem;" id="successNote"></p>
-      <div class="order-tag" id="orderIdDisplay"></div>
-      <a href="/" style="display: block; text-decoration: none; background: #fff; color: #000; padding: 14px; border-radius: 12px; font-family: 'Space Grotesk'; font-weight: 700;">Return to Storefront</a>
+    <div id="orderSuccess" class="panel order-success">
+      <h2>Order Authorized!</h2>
+      <p id="receiptMsg">Your hardware provisioning order has been recorded into the merchant ledger.</p>
+      <a href="/" class="pay-btn" style="display:inline-block; text-decoration:none; padding:12px 30px; width:auto;">Back to Catalog</a>
     </div>
   </div>
 
   <script>
-    const formatINR = val => new Intl.NumberFormat('en-IN', {
-      style: 'currency', currency: 'INR', maximumFractionDigits: 0
-    }).format(val);
-
-    let cart = JSON.parse(localStorage.getItem('nexus_cart') || '[]');
+    const cart = JSON.parse(localStorage.getItem('nexus_cart') || '[]');
+    const formatINR = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
 
     function renderSummary() {
-      const container = document.getElementById('summaryItems');
+      const list = document.getElementById('checkoutItemList');
+      const totalEl = document.getElementById('checkoutTotal');
+
       if (cart.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 40px 0;">No items in checkout manifest.</p>';
-        document.getElementById('submitBtn').disabled = true;
-        document.getElementById('submitBtn').style.opacity = '0.5';
+        list.innerHTML = '<p style="color:var(--text-muted);">No items in cart.</p>';
         return;
       }
 
-      container.innerHTML = cart.map(item => `
-        <div class="summary-item">
-          <div class="item-thumb-wrap">
-            <img class="item-thumb" src="${item.image}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80'">
-            <span class="item-qty-tag">${item.qty}</span>
+      list.innerHTML = cart.map(i => `
+        <div class="order-item">
+          <div>
+            <div style="font-weight:600;">${i.name}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted);">Qty: ${i.qty} &bull; ${formatINR(i.price)} each</div>
           </div>
-          <div class="item-details">
-            <div class="item-name">${item.name}</div>
-            <div class="item-price">${formatINR(item.price)} each</div>
-          </div>
-          <div class="price-font" style="font-weight:700;">${formatINR(item.price * item.qty)}</div>
+          <div style="font-weight:600;">${formatINR(i.price * i.qty)}</div>
         </div>
       `).join('');
 
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      document.getElementById('subTotal').innerText = formatINR(total);
-      document.getElementById('grandTotal').innerText = formatINR(total);
-      document.getElementById('submitBtn').innerText = `Authorize & Pay ${formatINR(total)}`;
+      totalEl.innerText = formatINR(total);
     }
 
-    function toggleMethod(radio) {
-      document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('active'));
-      radio.closest('.pay-card').classList.add('active');
-    }
-
-    async function handlePaySubmit(e) {
+    async function processPayment(e) {
       e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      btn.innerText = 'Broadcasting Order...';
-      btn.disabled = true;
-
-      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
       const buyerName = document.getElementById('buyerName').value;
+      const buyerEmail = document.getElementById('buyerEmail').value;
+      const buyerAddress = document.getElementById('buyerAddress').value;
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
-      try {
-        const res = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: cart, buyerName: buyerName, total: total })
-        });
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart, buyerName, buyerEmail, buyerAddress, paymentMethod, total })
+      });
+
+      if (res.ok) {
         const data = await res.json();
-
         localStorage.removeItem('nexus_cart');
-        document.getElementById('successNote').innerText = `Thank you, ${buyerName}. Hardware allocation confirmed for shipping.`;
-        document.getElementById('orderIdDisplay').innerText = `Tracking Reference: ${data.orderId}`;
-        document.getElementById('successModal').classList.remove('hidden');
-      } catch (err) {
-        alert('Transaction processing error.');
-        btn.disabled = false;
+        document.getElementById('checkoutContent').style.display = 'none';
+        document.getElementById('orderSuccess').style.display = 'block';
+        document.getElementById('receiptMsg').innerText = `Order ID: ${data.orderId} has been confirmed. Deliverable to: ${buyerName} (${buyerAddress}).`;
       }
     }
 
