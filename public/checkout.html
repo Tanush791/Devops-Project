@@ -2,22 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NexusCore // Secure Checkout</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #030509;
-      --surface: rgba(15, 20, 31, 0.7);
-      --border: rgba(255, 255, 255, 0.08);
-      --primary: #8b5cf6;
-      --accent: #06b6d4;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --success: #10b981;
-    }
+    :root { --bg: #030509; --surface: rgba(15, 20, 31, 0.7); --border: rgba(255, 255, 255, 0.08); --primary: #8b5cf6; --accent: #06b6d4; --text-main: #f8fafc; --text-muted: #94a3b8; --success: #10b981; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; padding: 40px 20px; }
     h1, h2, h3, .brand { font-family: 'Space Grotesk', sans-serif; }
@@ -26,29 +14,31 @@
     .brand { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
     .brand-dot { width: 12px; height: 12px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; }
     .back-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
-    .back-link:hover { color: #fff; }
 
     .checkout-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; }
     .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; backdrop-filter: blur(12px); }
-    .panel h2 { font-size: 1.3rem; margin-bottom: 20px; color: #fff; }
     .form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .form-group label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
     .form-group input, .form-group textarea, .form-group select { background: rgba(0,0,0,0.4); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none; }
-    .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
-
+    
     .order-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
-    .order-item:last-child { border-bottom: none; }
     .total-box { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 1.4rem; font-family: 'Space Grotesk'; font-weight: 700; color: var(--accent); }
-
     .pay-btn { width: 100%; background: #fff; color: #000; border: none; padding: 16px; border-radius: 12px; font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-top: 24px; transition: 0.2s; }
-    .pay-btn:hover { background: var(--accent); color: #000; }
-
-    .order-success { display: none; text-align: center; padding: 40px; }
-    .order-success h2 { font-size: 2rem; color: var(--success); margin-bottom: 12px; }
-    .order-success p { color: var(--text-muted); margin-bottom: 24px; }
+    
+    /* PROCESSING OVERLAY */
+    #processingOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; flex-direction:column; backdrop-filter:blur(5px); }
+    .spinner { width:50px; height:50px; border:4px solid rgba(255,255,255,0.1); border-top-color:var(--accent); border-radius:50%; animation: spin 1s infinite linear; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
+  <!-- LOADING OVERLAY -->
+  <div id="processingOverlay">
+    <div class="spinner"></div>
+    <h2 style="color:#fff; margin-top:24px; font-family:'Space Grotesk';">Authenticating Payment Gateway...</h2>
+    <p style="color:var(--text-muted); margin-top:10px;">Please do not refresh the page.</p>
+  </div>
+
   <div class="container">
     <header>
       <div class="brand"><div class="brand-dot"></div> NexusCore</div>
@@ -57,46 +47,37 @@
 
     <div id="checkoutContent" class="checkout-grid">
       <div class="panel">
-        <h2>Customer & Delivery Details</h2>
+        <h2 style="margin-bottom:20px;">Customer & Delivery Details</h2>
         <form id="checkoutForm" onsubmit="processPayment(event)">
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="buyerName" placeholder="e.g. Rahul Sharma" required>
-          </div>
-          <div class="form-group">
-            <label>Work Email</label>
-            <input type="email" id="buyerEmail" placeholder="rahul@company.io" required>
-          </div>
-          <div class="form-group">
-            <label>Shipping / Datacenter Address</label>
-            <textarea id="buyerAddress" rows="3" placeholder="Street, Building / Rack, City, PIN" required></textarea>
-          </div>
+          <div class="form-group"><label>Full Name</label><input type="text" id="buyerName" required></div>
+          <div class="form-group"><label>Work Email</label><input type="email" id="buyerEmail" required></div>
+          <div class="form-group"><label>Shipping Address</label><textarea id="buyerAddress" rows="3" required></textarea></div>
           <div class="form-group">
             <label>Payment Method</label>
-            <select id="paymentMethod">
-              <option value="Razorpay / UPI">Razorpay / UPI Instant</option>
-              <option value="Corporate Credit Card">Corporate Credit Card (Visa / Mastercard)</option>
-              <option value="Net Banking (HDFC / ICICI / SBI)">Net Banking</option>
-              <option value="Purchase Order (Net-30 Invoice)">Purchase Order (Net-30)</option>
-            </select>
+            <select id="paymentMethod"><option>Razorpay / UPI</option><option>Corporate Credit Card</option></select>
           </div>
           <button type="submit" id="submitOrderBtn" class="pay-btn">Confirm & Authorize Order</button>
         </form>
       </div>
 
       <div class="panel">
-        <h2>Order Summary</h2>
+        <h2 style="margin-bottom:20px;">Order Summary</h2>
         <div id="checkoutItemList"></div>
-        <div class="total-box">
-          <span>Total Payable</span>
-          <span id="checkoutTotal">₹0</span>
+        
+        <!-- PROMO CODE FIELD -->
+        <div class="form-group" style="flex-direction:row; gap:10px; margin-top:20px;">
+          <input type="text" id="promoInput" placeholder="Promo Code (e.g. DEVOPS10)" style="flex:1;">
+          <button type="button" onclick="applyPromo()" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid var(--border); padding:0 20px; border-radius:10px; cursor:pointer;">Apply</button>
         </div>
+        <div id="promoMsg" style="color:var(--success); font-size:0.85rem; font-weight:600; display:none;">10% Discount Applied!</div>
+
+        <div class="total-box"><span>Total Payable</span><span id="checkoutTotal">₹0</span></div>
       </div>
     </div>
 
-    <div id="orderSuccess" class="panel order-success">
-      <h2>Order Authorized!</h2>
-      <p id="receiptMsg">Your hardware provisioning order has been recorded into the merchant ledger.</p>
+    <div id="orderSuccess" class="panel" style="display:none; text-align:center;">
+      <h2 style="color:var(--success); font-size:2rem; margin-bottom:15px;">Order Authorized!</h2>
+      <p id="receiptMsg" style="color:var(--text-muted); margin-bottom:25px;">Your provisioning order is recorded.</p>
       <a href="/" class="pay-btn" style="display:inline-block; text-decoration:none; padding:12px 30px; width:auto;">Back to Catalog</a>
     </div>
   </div>
@@ -104,51 +85,47 @@
   <script>
     const cart = JSON.parse(localStorage.getItem('nexus_cart') || '[]');
     const formatINR = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
+    let activePromo = '';
 
     function renderSummary() {
-      const list = document.getElementById('checkoutItemList');
-      const totalEl = document.getElementById('checkoutTotal');
-
-      if (cart.length === 0) {
-        list.innerHTML = '<p style="color:var(--text-muted);">No items in cart.</p>';
-        return;
-      }
-
-      list.innerHTML = cart.map(i => `
-        <div class="order-item">
-          <div>
-            <div style="font-weight:600;">${i.name}</div>
-            <div style="font-size:0.8rem; color:var(--text-muted);">Qty: ${i.qty} &bull; ${formatINR(i.price)} each</div>
-          </div>
-          <div style="font-weight:600;">${formatINR(i.price * i.qty)}</div>
-        </div>
-      `).join('');
-
-      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      totalEl.innerText = formatINR(total);
+      if(cart.length === 0) { document.getElementById('checkoutItemList').innerHTML = '<p>No items.</p>'; return; }
+      document.getElementById('checkoutItemList').innerHTML = cart.map(i => `<div class="order-item"><div><div style="font-weight:600;">${i.name}</div><div style="font-size:0.8rem; color:var(--text-muted);">Qty: ${i.qty} &bull; ${formatINR(i.price)}</div></div><div style="font-weight:600;">${formatINR(i.price * i.qty)}</div></div>`).join('');
+      
+      let subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      if(activePromo === 'DEVOPS10') subtotal = subtotal * 0.90; // Apply 10% on frontend UI
+      document.getElementById('checkoutTotal').innerText = formatINR(subtotal);
     }
 
-    async function processPayment(e) {
+    function applyPromo() {
+      const code = document.getElementById('promoInput').value.trim().toUpperCase();
+      if(code === 'DEVOPS10') { activePromo = code; document.getElementById('promoMsg').style.display = 'block'; renderSummary(); }
+      else { alert('Invalid Promo Code'); document.getElementById('promoInput').value = ''; }
+    }
+
+    function processPayment(e) {
       e.preventDefault();
-      const buyerName = document.getElementById('buyerName').value;
-      const buyerEmail = document.getElementById('buyerEmail').value;
-      const buyerAddress = document.getElementById('buyerAddress').value;
-      const paymentMethod = document.getElementById('paymentMethod').value;
-      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      
+      // Show Mock Payment Gateway Overlay
+      document.getElementById('processingOverlay').style.display = 'flex';
+      
+      // Simulate 2 second API/Bank negotiation
+      setTimeout(async () => {
+        const body = {
+          items: cart, buyerName: document.getElementById('buyerName').value,
+          buyerEmail: document.getElementById('buyerEmail').value, buyerAddress: document.getElementById('buyerAddress').value,
+          paymentMethod: document.getElementById('paymentMethod').value, promoCode: activePromo
+        };
 
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: cart, buyerName, buyerEmail, buyerAddress, paymentMethod, total })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.removeItem('nexus_cart');
-        document.getElementById('checkoutContent').style.display = 'none';
-        document.getElementById('orderSuccess').style.display = 'block';
-        document.getElementById('receiptMsg').innerText = `Order ID: ${data.orderId} has been confirmed. Deliverable to: ${buyerName} (${buyerAddress}).`;
-      }
+        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.removeItem('nexus_cart');
+          document.getElementById('processingOverlay').style.display = 'none';
+          document.getElementById('checkoutContent').style.display = 'none';
+          document.getElementById('orderSuccess').style.display = 'block';
+          document.getElementById('receiptMsg').innerText = `Order ID: ${data.orderId} has been confirmed.`;
+        }
+      }, 2000);
     }
 
     renderSummary();

@@ -1,26 +1,110 @@
 [
   {
-    "id": 1,
+    "id": 101,
     "name": "NVMe Edge Server Node",
     "category": "Compute",
     "price": 74999,
+    "stock": 12,
     "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=80",
-    "desc": "16-core ARM CPU, 64GB ECC RAM, dual 2.5G NICs designed for Kubernetes worker nodes."
+    "desc": "16-core ARM CPU, 64GB ECC RAM, dual 2.5G NICs."
   },
   {
-    "id": 2,
-    "name": "Managed 8-Port PoE Switch",
+    "id": 102,
+    "name": "Neural Processing Unit v4",
+    "category": "Compute",
+    "price": 145000,
+    "stock": 4,
+    "image": "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&auto=format&fit=crop&q=80",
+    "desc": "Next-gen AI inference accelerator delivering 250 TFLOPs."
+  },
+  {
+    "id": 103,
+    "name": "100GbE Top-of-Rack Switch",
     "category": "Network",
-    "price": 14999,
+    "price": 215000,
+    "stock": 2,
     "image": "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&auto=format&fit=crop&q=80",
-    "desc": "Layer-2 managed gigabit switch with 802.3at PoE+ and quiet passive cooling."
+    "desc": "32-port 100 Gigabit Ethernet switch with ultra-low latency."
   },
   {
-    "id": 3,
-    "name": "Hardware Security Key (FIDO2)",
+    "id": 104,
+    "name": "32TB Enterprise U.2 NVMe SSD",
+    "category": "Storage",
+    "price": 85000,
+    "stock": 0,
+    "image": "https://images.unsplash.com/photo-1628527304948-06157ee3c8a6?w=600&auto=format&fit=crop&q=80",
+    "desc": "PCIe Gen 4.0 data center solid state drive."
+  },
+  {
+    "id": 105,
+    "name": "Hardware Security Module (HSM)",
     "category": "Security",
-    "price": 4599,
-    "image": "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=600&auto=format&fit=crop&q=80",
-    "desc": "USB-C cryptographic authenticator with dual NFC and tamper-resistant silicon."
+    "price": 195000,
+    "stock": 5,
+    "image": "https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=600&auto=format&fit=crop&q=80",
+    "desc": "FIPS 140-2 Level 3 certified appliance for secure keys."
+  },
+  {
+    "id": 106,
+    "name": "64-Core Threadripper",
+    "category": "Compute",
+    "price": 380000,
+    "stock": 3,
+    "image": "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=600&auto=format&fit=crop&q=80",
+    "desc": "Uncompromising compute power with 256MB L3 Cache."
+  },
+  {
+    "id": 107,
+    "name": "Edge Router SD-WAN Gateway",
+    "category": "Network",
+    "price": 45000,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1506399558188-acca6f8cbf41?w=600&auto=format&fit=crop&q=80",
+    "desc": "Cloud-managed secure branch routing."
+  },
+  {
+    "id": 108,
+    "name": "4U High-Density Storage JBOD",
+    "category": "Storage",
+    "price": 120000,
+    "stock": 1,
+    "image": "https://images.unsplash.com/photo-1524439188326-e47322d1cef2?w=600&auto=format&fit=crop&q=80",
+    "desc": "Scalable 60-bay storage chassis."
+  },
+  {
+    "id": 110,
+    "name": "SFP28 25G Fiber Transceiver",
+    "category": "Network",
+    "price": 12500,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1541884848529-6887eb215b28?w=600&auto=format&fit=crop&q=80",
+    "desc": "Hot-swappable 25-Gigabit Ethernet optical transceiver."
+  },
+  {
+    "id": 111,
+    "name": "Liquid Immersion Cooling Rig",
+    "category": "Compute",
+    "price": 540000,
+    "stock": 2,
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80",
+    "desc": "Two-phase immersion cooling tank for high-density overclocked GPU clusters."
+  },
+  {
+    "id": 113,
+    "name": "Quantum Key Distributor (QKD)",
+    "category": "Security",
+    "price": 1200000,
+    "stock": 1,
+    "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&auto=format&fit=crop&q=80",
+    "desc": "Uses quantum mechanics to guarantee physically unbreakable encryption keys."
+  },
+  {
+    "id": 116,
+    "name": "800G OSFP Fiber Transceiver",
+    "category": "Network",
+    "price": 42000,
+    "stock": 22,
+    "image": "https://images.unsplash.com/photo-1498084393753-b411b2d26b34?w=600&auto=format&fit=crop&q=80",
+    "desc": "Next-generation 800-Gigabit optics for spine-and-leaf datacenter topologies."
   }
 ]
