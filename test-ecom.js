@@ -23,36 +23,33 @@ async function runTest() {
     .build();
 
   try {
-    // 1. Navigate to storefront
+    // 1. Navigate to Storefront
     console.log("[TEST 1] Navigating to http://localhost:3000...");
     await driver.get('http://localhost:3000');
     await driver.wait(until.titleContains('NexusCore'), 5000);
-    console.log("✓ Page loaded with correct title.\n");
+    console.log("✓ Storefront loaded.\n");
 
-    // 2. Wait for products to render
-    console.log("[TEST 2] Verifying catalog products rendered...");
-    const firstQuickAddBtn = await driver.wait(
-      until.elementLocated(By.css('.btn-quick-add')),
-      7000
+    // 2. Wait for products and select first in-stock item
+    console.log("[TEST 2] Verifying product catalog...");
+    await driver.wait(until.elementLocated(By.css('.product-card')), 7000);
+    const addBtn = await driver.wait(
+      until.elementLocated(By.css('.btn-quick-add:not([disabled])')),
+      5000
     );
-    console.log("✓ Catalog grid populated successfully.\n");
+    console.log("✓ Product catalog populated and in-stock item found.\n");
 
-    // 3. Add first item to cart
-    console.log("[TEST 3] Triggering '+ Quick Add' on the first product...");
-    await driver.executeScript("arguments[0].click();", firstQuickAddBtn);
-
+    // 3. Add to Cart
+    console.log("[TEST 3] Adding hardware unit to bag...");
+    await driver.executeScript("arguments[0].click();", addBtn);
     const cartBadge = await driver.findElement(By.id('cartCount'));
-    await driver.wait(async () => {
-      const txt = await cartBadge.getText();
-      return txt === '1';
-    }, 4000);
-    console.log("✓ Cart badge incremented to 1.\n");
+    await driver.wait(async () => (await cartBadge.getText()) === '1', 4000);
+    console.log("✓ Cart counter updated to 1.\n");
 
-    // 4. Open cart drawer and proceed
-    console.log("[TEST 4] Opening cart drawer and clicking Proceed to Checkout...");
-    const cartBtn = await driver.findElement(By.id('cartButton'));
-    await cartBtn.click();
-    await driver.sleep(600);
+    // 4. Open drawer and navigate to checkout
+    console.log("[TEST 4] Opening bag and proceeding to checkout...");
+    const bagBtn = await driver.findElement(By.id('cartButton'));
+    await bagBtn.click();
+    await driver.sleep(500);
 
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.css('#cartDrawer .checkout-btn')),
@@ -60,55 +57,39 @@ async function runTest() {
     );
     await checkoutBtn.click();
 
-    // 5. Verify navigation to checkout page
-    console.log("[TEST 5] Checking navigation to checkout page...");
+    // 5. Verify redirect
+    console.log("[TEST 5] Checking navigation to /checkout.html...");
     await driver.wait(until.urlContains('/checkout.html'), 5000);
-    console.log("✓ Successfully redirected to /checkout.html.\n");
+    console.log("✓ Reached secure checkout page.\n");
 
-    // 6. Complete checkout form using universal field discovery
-    console.log("[TEST 6] Detecting and populating checkout fields...");
-    await driver.sleep(1000);
+    // 6. Complete form and apply promo code
+    console.log("[TEST 6] Filling customer details and applying promo...");
+    await driver.findElement(By.id('buyerName')).sendKeys('DevOps Lead QA');
+    await driver.findElement(By.id('buyerEmail')).sendKeys('lead.qa@datacenter.net');
+    await driver.findElement(By.id('buyerAddress')).sendKeys('Rack 4B, DC Hub 1, Hyderabad');
 
-    const inputs = await driver.findElements(By.css('form input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]), form textarea'));
-    
-    if (inputs.length === 0) {
-      // Fallback if elements aren't wrapped in <form>
-      const allTextInputs = await driver.findElements(By.css('input[type="text"], input[type="email"], textarea'));
-      for (const input of allTextInputs) {
-        if (await input.isDisplayed()) {
-          await input.clear();
-          await input.sendKeys('Test Buyer Details');
-        }
-      }
-    } else {
-      for (const input of inputs) {
-        if (await input.isDisplayed()) {
-          const type = await input.getAttribute('type');
-          await input.clear();
-          if (type === 'email') {
-            await input.sendKeys('qa.test@nexuscore.io');
-          } else if (type === 'number' || type === 'tel') {
-            await input.sendKeys('9876543210');
-          } else {
-            await input.sendKeys('Enterprise Node Station, Hyderabad');
-          }
-        }
-      }
-    }
-    console.log("✓ All available customer form fields populated.\n");
+    const promoInput = await driver.findElement(By.id('promoInput'));
+    await promoInput.sendKeys('DEVOPS10');
+    const applyPromoBtn = await driver.findElement(By.xpath("//button[text()='Apply']"));
+    await applyPromoBtn.click();
+    await driver.wait(until.elementLocated(By.id('promoMsg')), 3000);
+    console.log("✓ Applied 10% promo discount code.\n");
 
-    // 7. Submit order
-    console.log("[TEST 7] Submitting order payment...");
-    const submitBtn = await driver.wait(
-      until.elementLocated(By.css('button[type="submit"], form button, .checkout-btn')),
-      5000
-    );
+    // 7. Submit order and wait for mock payment gateway overlay
+    console.log("[TEST 7] Authorizing order via Mock Payment Gateway...");
+    const submitBtn = await driver.findElement(By.id('submitOrderBtn'));
     await driver.executeScript("arguments[0].click();", submitBtn);
 
-    // 8. Confirm receipt or completion state
-    console.log("[TEST 8] Waiting for order confirmation...");
-    await driver.sleep(2500);
-    console.log("✓ Order submitted and transaction processed.\n");
+    // Wait for the 2-second processing overlay to clear and receipt to show
+    await driver.wait(
+      until.elementLocated(By.id('orderSuccess')),
+      7000
+    );
+    await driver.wait(async () => {
+      const display = await driver.findElement(By.id('orderSuccess')).getCssValue('display');
+      return display !== 'none';
+    }, 7000);
+    console.log("✓ Payment authorized and order recorded!\n");
 
     console.log("==========================================");
     console.log(" ALL TESTS PASSED SUCCESSFULLY! ✓");
